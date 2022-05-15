@@ -2,39 +2,16 @@
 
 const searchItems = document.querySelector("#search");
 const searchBtns = document.querySelectorAll(".btn-search");
-
 let allProductsdata = [];
 const filters = {
   searchItems: "",
 };
-
-
-
-function renderProducts(_products, _fileters) {
-  const filteredProducts = _products.filter((p) => {
-    return p.title.toLowerCase().includes(_fileters.searchItems.toLowerCase());
-  });
-  return filteredProducts;
-  // console.log(filteredProducts)
-  // render to DOM
-}
-
-searchItems.addEventListener("input", (e) => {
-  // console.log(e.target.value)
-  filters.searchItems = e.target.value;
-  renderProducts(allProductsdata, filters);
-});
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-
+/////////////////
 const productsDOM = document.querySelector(".products-center");
 const cartTotal = document.querySelector(".cart-total");
 const cartItems = document.querySelector(".cart-items");
 const cartContant = document.querySelector(".cart-content");
 const clearCart = document.querySelector(".clear-Cart");
-// import {
-//   productsData
-// } from "./products.js";
 
 let cart = [];
 let buttonsDOM = [];
@@ -230,34 +207,29 @@ class Storage {
   }
 }
 
+function renderProducts(_products, _fileters) {
+  const filteredProducts = _products.filter((p) => {
+    return p.title.toLowerCase().includes(_fileters.searchItems.toLowerCase());
+  });
+  // render to DOM
+  let productsData = filteredProducts;
+  const ui = new UI();
+  ui.setupApp();
+  ui.displayProducts(productsData);
+  ui.getAddToCartBtns();
+  ui.cartLogic();
+  Storage.saveProducts(productsData);
+}
 document.addEventListener("DOMContentLoaded", () => {
   axios
     .get("http://localhost:3000/items")
     .then((res) => {
       allProductsdata = res.data;
-      // render products on DOM
-
-      let productsData = allProductsdata;
-      const ui = new UI();
-      ui.setupApp();
-      ui.displayProducts(productsData);
-      ui.getAddToCartBtns();
-      ui.cartLogic();
-      //  let filteredProducts= renderProducts(res.data, filters);
+      renderProducts(allProductsdata, filters);
       searchItems.addEventListener("input", (e) => {
-        // console.log(e.target.value)
         filters.searchItems = e.target.value;
-        let allProductsdata2 = renderProducts(allProductsdata, filters);
-        productsData = allProductsdata2;
-        // console.log(productsData)
-        // const ui = new UI();
-        ui.setupApp();
-        ui.displayProducts(productsData);
-        ui.getAddToCartBtns();
-        ui.cartLogic();
-
-      });
-      Storage.saveProducts(productsData);
+        renderProducts(allProductsdata, filters);       
+      });      
     })
     .catch((err) => console.log(err));
 });
@@ -267,13 +239,6 @@ searchBtns.forEach(btn => {
     const filter = e.target.dataset.filter
     console.log(filter)
     filters.searchItems = filter
-    let allProductsdata2 = renderProducts(allProductsdata, filters);
-    let productsData = allProductsdata2;
-    // console.log(productsData)
-    const ui = new UI();
-    ui.setupApp();
-    ui.displayProducts(productsData);
-    ui.getAddToCartBtns();
-    ui.cartLogic();
+    renderProducts(allProductsdata, filters);    
   })
 })
